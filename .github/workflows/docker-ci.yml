@@ -76,7 +76,9 @@ jobs:
 
           cd /tmp/mall
           # 先从根目录安装所有子模块到本地仓库（关键！）
-          mvn clean install -DskipTests -q
+          # mvn clean install -DskipTests -q
+          mvn clean install -DskipTests -q -Ddocker.skip=true
+
 
           cd /tmp/mall/mall-admin
 

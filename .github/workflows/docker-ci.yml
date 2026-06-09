@@ -44,13 +44,43 @@ jobs:
           pip install -r requirements.txt
 
       # 3. 构建 mall 后端镜像并启动
+#      - name: 启动 mall 后端（Docker）
+#        run: |
+#          git clone --depth 1 https://github.com/macrozheng/mall.git /tmp/mall
+#          cd /tmp/mall/mall-admin
+#          mvn clean package -DskipTests -q
+#
+#          # 写 Dockerfile 并构建
+#          cat > Dockerfile << 'EOF'
+#          FROM openjdk:8-jdk-alpine
+#          COPY target/mall-admin-*.jar /app.jar
+#          EXPOSE 8080
+#          ENTRYPOINT ["java","-jar","/app.jar"]
+#          EOF
+#
+#          docker build -t mall-backend:latest .
+#
+#          # 启动容器（连接 MySQL 服务网络）
+#          docker run -d \
+#            --name mall-backend \
+#            --network ${{ job.services.mysql.network }} \
+#            -p 8080:8080 \
+#            -e SPRING_DATASOURCE_URL="jdbc:mysql://mysql:3306/mall?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" \
+#            -e SPRING_DATASOURCE_USERNAME=root \
+#            -e SPRING_DATASOURCE_PASSWORD=root \
+#            mall-backend:latest
+      # ===== 修改从这里开始 =====
       - name: 启动 mall 后端（Docker）
         run: |
           git clone --depth 1 https://github.com/macrozheng/mall.git /tmp/mall
-          cd /tmp/mall/mall-admin
-          mvn clean package -DskipTests -q
 
-          # 写 Dockerfile 并构建
+          cd /tmp/mall
+          # 先从根目录安装所有子模块到本地仓库（关键！）
+          mvn clean install -DskipTests -q
+
+          cd /tmp/mall/mall-admin
+
+          # 写 Dockerfile 并构建镜像
           cat > Dockerfile << 'EOF'
           FROM openjdk:8-jdk-alpine
           COPY target/mall-admin-*.jar /app.jar
@@ -60,7 +90,6 @@ jobs:
 
           docker build -t mall-backend:latest .
 
-          # 启动容器（连接 MySQL 服务网络）
           docker run -d \
             --name mall-backend \
             --network ${{ job.services.mysql.network }} \
@@ -69,6 +98,8 @@ jobs:
             -e SPRING_DATASOURCE_USERNAME=root \
             -e SPRING_DATASOURCE_PASSWORD=root \
             mall-backend:latest
+      # ===== 修改到这里结束 =====
+
 
       # 4. 等待后端就绪
       - name: 等待后端服务就绪

@@ -8,7 +8,8 @@
 #   4. docker push your-dockerhub/mall-backend:latest
 # ============================================
 
-FROM openjdk:8-jdk-alpine
+# FROM openjdk:8-jdk-alpine
+FROM eclipse-temurin:8-jre-alpine
 
 # 设置时区（可选）
 RUN apk add --no-cache tzdata curl \

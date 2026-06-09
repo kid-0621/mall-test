@@ -83,8 +83,10 @@ jobs:
           cd /tmp/mall/mall-admin
 
           # 写 Dockerfile 并构建镜像
+          # cat > Dockerfile << 'EOF'
+          # FROM openjdk:8-jdk-alpine
           cat > Dockerfile << 'EOF'
-          FROM openjdk:8-jdk-alpine
+          FROM eclipse-temurin:8-jre-alpine
           COPY target/mall-admin-*.jar /app.jar
           EXPOSE 8080
           ENTRYPOINT ["java","-jar","/app.jar"]

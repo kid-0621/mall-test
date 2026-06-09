@@ -1,0 +1,29 @@
+# 商品分类测试数据
+category:
+  create:
+    parentId: 0
+    name: "AutoTest分类"
+    productUnit: "件"
+    navStatus: 1
+    showStatus: 1
+    sort: 0
+    keywords: "测试"
+    description: "自动化测试临时分类，用例结束后删除"
+
+# 属性分类测试数据
+attr_category:
+  create:
+    name: "AutoTest属性分类"
+
+# 商品属性测试数据
+attr:
+  create:
+    productAttributeCategoryId: null   # 运行时动态填入
+    name: "AutoTest属性"
+    selectType: 1
+    inputType: 0
+    inputList: "选项A,选项B"
+    sort: 0
+    filterType: 0
+    searchType: 0
+    type: 0

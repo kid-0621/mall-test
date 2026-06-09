@@ -1,0 +1,51 @@
+# 角色管理测试数据
+role:
+  create:
+    name: "AutoTest角色"
+    description: "自动化测试创建的角色"
+    adminCount: 0
+    sort: 0
+    status: 1
+
+  update:
+    name: "AutoTest角色_已更新"
+    description: "自动化测试更新后的角色"
+    sort: 10
+
+# 菜单管理测试数据
+menu:
+  create:
+    parentId: 0
+    title: "AutoTest菜单"
+    name: "autotest_menu"
+    icon: "menu"
+    level: 0
+    sort: 0
+    hidden: 0
+
+  update:
+    title: "AutoTest菜单_已更新"
+    icon: "menu_new"
+    sort: 99
+
+# 资源管理测试数据
+resource:
+  create:
+    name: "AutoTest资源"
+    url: "/auto/test"
+    description: "自动化测试资源"
+    categoryId: 1
+
+  update:
+    name: "AutoTest资源_已更新"
+    url: "/auto/test/updated"
+
+# 管理员管理测试数据
+admin:
+  register:
+    username: "autotest_admin"
+    password: "Test@123456"
+    icon: "https://example.com/avatar.png"
+    email: "autotest@test.com"
+    nickName: "AutoTest"
+    note: "自动化测试创建的临时管理员"

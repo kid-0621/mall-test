@@ -1,0 +1,113 @@
+name: Mall API Test (Docker)
+
+on:
+  push:
+    branches: [master, main, dev]
+  pull_request:
+    branches: [master, main]
+  schedule:
+    - cron: "0 0 * * *"   # 每天 UTC 0:00（北京时间 8:00）
+
+jobs:
+  api-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # MySQL 服务
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mall
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -proot"
+          --health-interval=10s
+          --health-retries=10
+
+    steps:
+      # 1. 拉取测试代码
+      - name: Checkout 测试代码
+        uses: actions/checkout@v4
+
+      # 2. 配置 Python
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: 安装 Python 依赖
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 3. 构建 mall 后端镜像并启动
+      - name: 启动 mall 后端（Docker）
+        run: |
+          git clone --depth 1 https://github.com/macrozheng/mall.git /tmp/mall
+          cd /tmp/mall/mall-admin
+          mvn clean package -DskipTests -q
+
+          # 写 Dockerfile 并构建
+          cat > Dockerfile << 'EOF'
+          FROM openjdk:8-jdk-alpine
+          COPY target/mall-admin-*.jar /app.jar
+          EXPOSE 8080
+          ENTRYPOINT ["java","-jar","/app.jar"]
+          EOF
+
+          docker build -t mall-backend:latest .
+
+          # 启动容器（连接 MySQL 服务网络）
+          docker run -d \
+            --name mall-backend \
+            --network ${{ job.services.mysql.network }} \
+            -p 8080:8080 \
+            -e SPRING_DATASOURCE_URL="jdbc:mysql://mysql:3306/mall?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" \
+            -e SPRING_DATASOURCE_USERNAME=root \
+            -e SPRING_DATASOURCE_PASSWORD=root \
+            mall-backend:latest
+
+      # 4. 等待后端就绪
+      - name: 等待后端服务就绪
+        run: |
+          for i in $(seq 1 24); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 || echo "000")
+            if [ "$STATUS" != "000" ]; then
+              echo "✅ mall 后端就绪 (HTTP $STATUS)"
+              break
+            fi
+            echo "   重试 $i..."
+            sleep 5
+          done
+
+      # 5. 运行测试
+      - name: 运行 pytest
+        run: pytest testcases/ -v --alluredir=allure-results
+
+      # 6. 生成 Allure 报告
+      - name: 安装 Allure CLI & 生成报告
+        if: always()
+        run: |
+          wget -q https://github.com/allure-framework/allure2/releases/download/2.32.0/allure-2.32.0.tgz
+          tar -zxvf allure-2.32.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.32.0/bin/allure /usr/local/bin/allure
+          allure generate allure-results -o allure-report --clean
+
+      # 7. 上传报告
+      - name: 上传 Allure 报告（Artifact）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 7
+
+      # 8. 清理
+      - name: 清理容器
+        if: always()
+        run: |
+          docker stop mall-backend || true
+          docker rm mall-backend || true

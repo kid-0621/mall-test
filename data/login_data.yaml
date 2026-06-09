@@ -1,0 +1,31 @@
+# 登录接口测试数据
+login_test_data:
+  - case_name: "正确用户名密码登录"
+    username: "admin"
+    password: "macro123"
+    expect_success: true
+    desc: "正常登录场景"
+
+  - case_name: "密码错误"
+    username: "admin"
+    password: "wrong_pwd"
+    expect_success: false
+    desc: "密码不正确"
+
+  - case_name: "用户名为空"
+    username: ""
+    password: "macro123"
+    expect_success: false
+    desc: "用户名为空校验"
+
+  - case_name: "密码为空"
+    username: "admin"
+    password: ""
+    expect_success: false
+    desc: "密码为空校验"
+
+  - case_name: "用户不存在"
+    username: "no_such_user"
+    password: "123456"
+    expect_success: false
+    desc: "不存在的用户"

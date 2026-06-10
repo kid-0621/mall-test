@@ -96,9 +96,8 @@ jobs:
 
           docker run -d \
             --name mall-backend \
-            --network ${{ job.services.mysql.network }} \
-            -p 8080:8080 \
-            -e SPRING_DATASOURCE_URL="jdbc:mysql://mysql:3306/mall?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" \
+            --network host \
+            -e SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/mall?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" \
             -e SPRING_DATASOURCE_USERNAME=root \
             -e SPRING_DATASOURCE_PASSWORD=root \
             mall-backend:latest

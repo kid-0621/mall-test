@@ -119,8 +119,14 @@ jobs:
           done
 
       # 5. 运行测试
+#      - name: 运行 pytest
+#        run: pytest testcases/ -v --alluredir=allure-results
+      # ===== 修改这里 =====
       - name: 运行 pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest testcases/ -v --alluredir=allure-results
+
 
       # 6. 生成 Allure 报告
       - name: 安装 Allure CLI & 生成报告

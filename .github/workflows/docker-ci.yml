@@ -76,20 +76,41 @@ jobs:
           
           echo "mall 后端 PID: $!"
           echo "等待 Spring Boot 启动（Maven 编译已完成）..."
+          sleep 20
 
 
       # 4. 等待后端就绪
+#      - name: 等待后端服务就绪
+#        run: |
+#          for i in $(seq 1 24); do
+#            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 || echo "000")
+#            if [ "$STATUS" != "000" ]; then
+#              echo "✅ mall 后端就绪 (HTTP $STATUS)"
+#              break
+#            fi
+#            echo "   重试 $i..."
+#            sleep 5
+#          done
       - name: 等待后端服务就绪
         run: |
-          for i in $(seq 1 24); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 || echo "000")
+          echo "开始等待 mall 后端（最多等 5 分钟）..."
+          for i in $(seq 1 60); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health 2>/dev/null \
+                     || curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 2>/dev/null \
+                     || echo "000")
+            echo "   第 $i 次探测，HTTP $STATUS"
             if [ "$STATUS" != "000" ]; then
               echo "✅ mall 后端就绪 (HTTP $STATUS)"
               break
             fi
-            echo "   重试 $i..."
+            if [ "$i" -eq 60 ]; then
+              echo "❌ 超时！打印后端日志："
+              cat /tmp/mall-backend.log | tail -50
+              exit 1
+            fi
             sleep 5
           done
+
 
       # 5. 运行测试
 #      - name: 运行 pytest

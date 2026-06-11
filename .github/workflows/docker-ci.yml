@@ -49,6 +49,32 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      # 2.5. 等待 MySQL 就绪 + 导入 mall 初始化 SQL
+      - name: 初始化数据库（导入 mall SQL）
+        run: |
+          # 安装 MySQL 客户端
+          sudo apt-get update -qq && sudo apt-get install -y -qq mysql-client
+
+          # 等待 MySQL 就绪
+          echo "等待 MySQL 就绪..."
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h localhost -u root -proot --silent 2>/dev/null; then
+              echo "✅ MySQL 就绪"
+              break
+            fi
+            echo "   重试 $i/30..."
+            sleep 3
+          done
+
+          # 克隆 mall 获取 SQL 文件
+          git clone --depth 1 https://github.com/macrozheng/mall.git /tmp/mall-sql
+
+          # 导入 mall 初始化 SQL
+          echo "导入 mall.sql..."
+          mysql -h localhost -u root -proot mall < /tmp/mall-sql/document/sql/mall.sql
+          echo "✅ 数据库初始化完成"
+
+
 
       # 3. 编译 mall 后端并直接运行（不用 Docker，避免 Docker-in-Docker 网络问题）
       - name: 编译并启动 mall 后端

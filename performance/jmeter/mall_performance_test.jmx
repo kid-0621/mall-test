@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="mall 商城后台管理系统 - 性能测试" enabled="true">
+      <stringProp name="TestPlan.comments">核心业务链路压测 - 使用 JMeter 实施</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+
+      <!-- 全局变量 -->
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="全局变量" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="HOST" elementType="Argument">
+            <stringProp name="Argument.name">HOST</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.desc">mall-admin 服务地址</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">8080</stringProp>
+            <stringProp name="Argument.desc">mall-admin 服务端口</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="USERNAME" elementType="Argument">
+            <stringProp name="Argument.name">USERNAME</stringProp>
+            <stringProp name="Argument.value">admin</stringProp>
+            <stringProp name="Argument.desc">管理员账号</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PASSWORD" elementType="Argument">
+            <stringProp name="Argument.name">PASSWORD</stringProp>
+            <stringProp name="Argument.value">macro123</stringProp>
+            <stringProp name="Argument.desc">管理员密码</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+
+      <!-- HTTP 请求默认值 -->
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP 请求默认值" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+        <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+        <stringProp name="HTTPSampler.protocol">http</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
+        <stringProp name="HTTPSampler.path">/</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+
+      <!-- HTTP Header 管理器（初始为空，登录后由 JSON Extractor 填充） -->
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header 管理器" enabled="true">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+
+      <!-- 登录获取 Token - 仅执行一次 -->
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="登录获取 Token" enabled="true">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <longProp name="ThreadGroup.delay">0</longProp>
+        <longProp name="ThreadGroup.duration">0</longProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST 管理员登录" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="username" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${USERNAME}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">username</stringProp>
+                <stringProp name="Argument.desc">管理员用户名</stringProp>
+                <stringProp name="HTTPArgument.delimiter">&amp;</stringProp>
+                <boolProp name="HTTPArgument.required">true</boolProp>
+              </elementProp>
+              <elementProp name="password" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${PASSWORD}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">password</stringProp>
+                <stringProp name="Argument.desc">管理员密码</stringProp>
+                <stringProp name="HTTPArgument.delimiter">&amp;</stringProp>
+                <boolProp name="HTTPArgument.required">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.path">/admin/login</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="提取 Token" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">token,tokenHead</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.data.token,$.data.tokenHead</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1,1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+
+        <!-- 将 token 写入全局属性，供后续线程组使用 -->
+        <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Token 写入全局属性" enabled="true">
+          <stringProp name="cache_key">true</stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="script">import org.apache.jmeter.util.JMeterUtils;
+JMeterUtils.setProperty(&quot;AUTH_HEADER&quot;, vars.get(&quot;tokenHead&quot;) + vars.get(&quot;token&quot;));</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+        </JSR223PostProcessor>
+        <hashTree/>
+
+        <!-- 响应断言：code == 200 -->
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="断言：登录成功" enabled="true">
+          <collectionProp name="Asserion.test_strings">
+            <stringProp name="49586">&quot;code&quot;:200</stringProp>
+          </collectionProp>
+          <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+          <boolProp name="Assertion.assume_success">false</boolProp>
+          <intProp name="Assertion.test_type">2</intProp>
+        </ResponseAssertion>
+        <hashTree/>
+      </hashTree>
+
+      <!-- 调试：查看提取的变量 -->
+      <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="调试：打印 Token" enabled="true">
+        <stringProp name="cache_key">true</stringProp>
+        <stringProp name="filename"></stringProp>
+        <stringProp name="parameters"></stringProp>
+        <stringProp name="script">log.info(&quot;Token: &quot; + vars.get(&quot;token&quot;));
+log.info(&quot;Auth Header: &quot; + JMeterUtils.getProperty(&quot;AUTH_HEADER&quot;));
+SampleResult.setSuccessful(true);</stringProp>
+        <stringProp name="scriptLanguage">groovy</stringProp>
+      </JSR223Sampler>
+      <hashTree/>
+
+      <!-- 将全局属性中的 Auth Header 设置到 HTTP Header 管理器 -->
+      <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="设置全局 Authorization Header" enabled="true">
+        <stringProp name="cache_key">true</stringProp>
+        <stringProp name="filename"></stringProp>
+        <stringProp name="parameters"></stringProp>
+        <stringProp name="script">import org.apache.jmeter.protocol.http.control.HeaderManager;
+import org.apache.jmeter.protocol.http.control.Header;
+import org.apache.jmeter.threads.JMeterContextService;
+
+String authHeader = JMeterUtils.getProperty(&quot;AUTH_HEADER&quot;);
+if (authHeader != null) {
+    HeaderManager hm = JMeterContextService.getContext().getPreviousSampler().getHeaderManager();
+    if (hm != null) {
+        hm.add(new Header(&quot;Authorization&quot;, authHeader));
+    }
+    log.info(&quot;Authorization set: &quot; + authHeader.substring(0, Math.min(20, authHeader.length())) + &quot;...&quot;);
+}
+SampleResult.setSuccessful(true);</stringProp>
+        <stringProp name="scriptLanguage">groovy</stringProp>
+      </JSR223Sampler>
+      <hashTree/>
+    </hashTree>
+
+    <!-- ========== 场景一：核心业务链路（混合场景）========== -->
+    <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="核心业务链路 - 混合场景" enabled="true">
+      <intProp name="ThreadGroup.num_threads">50</intProp>
+      <intProp name="ThreadGroup.ramp_time">10</intProp>
+      <longProp name="ThreadGroup.delay">0</longProp>
+      <longProp name="ThreadGroup.duration">300</longProp>
+      <boolProp name="ThreadGroup.scheduler">true</boolProp>
+      <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+        <boolProp name="LoopController.continue_forever">false</boolProp>
+        <stringProp name="LoopController.loops">-1</stringProp>
+      </elementProp>
+    </ThreadGroup>
+    <hashTree>
+      <!-- 在每个 Sampler 前动态设置 Authorization Header -->
+      <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="动态设置 Authorization Header" enabled="true">
+        <stringProp name="cache_key">true</stringProp>
+        <stringProp name="filename"></stringProp>
+        <stringProp name="parameters"></stringProp>
+        <stringProp name="script">import org.apache.jmeter.protocol.http.control.Header;
+String authHeader = JMeterUtils.getProperty(&quot;AUTH_HEADER&quot;);
+if (authHeader != null) {
+    sampler.getHeaderManager().removeHeaderNamed(&quot;Authorization&quot;);
+    sampler.getHeaderManager().add(new Header(&quot;Authorization&quot;, authHeader));
+}</stringProp>
+        <stringProp name="scriptLanguage">groovy</stringProp>
+      </JSR223PreProcessor>
+      <hashTree/>
+
+      <!-- 1. 浏览商品列表（权重最高 ~25%）-->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 商品列表" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="pageNum" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">${__Random(1,10,)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageNum</stringProp>
+              <stringProp name="HTTPArgument.delimiter">&amp;</stringProp>
+            </elementProp>
+            <elementProp name="pageSize" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">${__Random(5,20,)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageSize</stringProp>
+              <stringProp name="HTTPArgument.delimiter">&amp;</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.path">/product/list</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+        <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+        <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+        <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+        <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+      </HTTPSamplerProxy>
+      <hashTree>
+        <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="断言：响应时间 &lt; 3000ms" enabled="true">
+          <stringProp name="DurationAssertion.duration">3000</stringProp>
+        </DurationAssertion>
+        <hashTree/>
+      </hashTree>
+
+      <!-- 2. 搜索商品 -->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 搜索商品" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="keyword" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">${__RandomFromMultipleVars(小米|华为|苹果|手机|笔记本电脑,)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">keyword</stringProp>
+              <stringProp name="HTTPArgument.delimiter">&amp;</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.path">/product/simpleList</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+
+      <!-- 3. 浏览订单列表（权重 ~15%）-->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 订单列表" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="pageNum" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">${__Random(1,5,)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageNum</stringProp>
+            </elementProp>
+            <elementProp name="pageSize" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">${__Random(5,20,)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageSize</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.path">/order/list</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+
+      <!-- 4. 查看优惠券列表 -->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 优惠券列表" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="pageNum" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">1</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageNum</stringProp>
+            </elementProp>
+            <elementProp name="pageSize" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">10</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageSize</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.path">/coupon/list</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+
+      <!-- 5. 浏览分类树 -->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 分类树" enabled="true">
+        <stringProp name="HTTPSampler.path">/productCategory/list/withChildren</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+
+      <!-- 6. 查看管理员信息 -->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 管理员信息" enabled="true">
+        <stringProp name="HTTPSampler.path">/admin/info</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+
+      <!-- 7. 查看品牌列表 -->
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET 品牌列表" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="pageNum" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">1</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageNum</stringProp>
+            </elementProp>
+            <elementProp name="pageSize" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">${__Random(5,20,)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">pageSize</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.path">/brand/list</stringProp>
+        <stringProp name="HTTPSampler.method">GET</stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+
+      <!-- 定时器：模拟用户思考时间 1~3 秒 -->
+      <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="思考时间 1~3秒" enabled="true">
+        <stringProp name="ConstantTimer.delay">1000</stringProp>
+        <stringProp name="RandomTimer.delayOffset">2000</stringProp>
+      </UniformRandomTimer>
+      <hashTree/>
+
+    </hashTree>
+
+    <!-- ========== 监听器：结果收集 ========== -->
+    <!-- 聚合报告 -->
+    <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="聚合报告" enabled="true">
+      <objProp>
+        <name>saveConfig</name>
+        <value class="SampleSaveConfiguration">
+          <time>true</time>
+          <latency>true</latency>
+          <timestamp>true</timestamp>
+          <success>true</success>
+          <label>true</label>
+          <code>true</code>
+          <message>true</message>
+          <threadName>true</threadName>
+          <dataType>true</dataType>
+          <encoding>false</encoding>
+          <assertions>true</assertions>
+          <subresults>true</subresults>
+          <responseData>false</responseData>
+          <samplerData>false</samplerData>
+          <xml>false</xml>
+          <fieldNames>true</fieldNames>
+          <responseHeaders>false</responseHeaders>
+          <requestHeaders>false</requestHeaders>
+          <responseDataOnError>false</responseDataOnError>
+          <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+          <bytes>true</bytes>
+          <url>true</url>
+        </value>
+      </objProp>
+      <stringProp name="filename">performance/jmeter/results/aggregate_report.csv</stringProp>
+    </ResultCollector>
+    <hashTree/>
+
+    <!-- 查看结果树（调试用，正式压测建议禁用） -->
+    <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="查看结果树（调试用）" enabled="false">
+      <objProp>
+        <name>saveConfig</name>
+        <value class="SampleSaveConfiguration">
+          <time>true</time>
+          <latency>true</latency>
+          <timestamp>true</timestamp>
+          <success>true</success>
+          <label>true</label>
+          <code>true</code>
+          <message>true</message>
+          <threadName>true</threadName>
+          <dataType>true</dataType>
+          <encoding>false</encoding>
+          <assertions>true</assertions>
+          <subresults>true</subresults>
+          <responseData>false</responseData>
+          <samplerData>false</samplerData>
+          <xml>false</xml>
+          <fieldNames>true</fieldNames>
+          <responseHeaders>false</responseHeaders>
+          <requestHeaders>false</requestHeaders>
+          <responseDataOnError>false</responseDataOnError>
+          <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+          <bytes>true</bytes>
+          <url>true</url>
+        </value>
+      </objProp>
+      <stringProp name="filename"></stringProp>
+    </ResultCollector>
+    <hashTree/>
+
+    <!-- 响应时间图 -->
+    <ResultCollector guiclass="StatGraphVisualizer" testclass="ResultCollector" testname="响应时间图" enabled="true">
+      <objProp>
+        <name>saveConfig</name>
+        <value class="SampleSaveConfiguration">
+          <time>true</time>
+          <latency>true</latency>
+          <timestamp>true</timestamp>
+          <success>true</success>
+          <label>true</label>
+          <code>true</code>
+          <message>true</message>
+          <threadName>true</threadName>
+          <dataType>true</dataType>
+          <encoding>false</encoding>
+          <assertions>true</assertions>
+          <subresults>true</subresults>
+          <responseData>false</responseData>
+          <samplerData>false</samplerData>
+          <xml>false</xml>
+          <fieldNames>true</fieldNames>
+          <responseHeaders>false</responseHeaders>
+          <requestHeaders>false</requestHeaders>
+          <responseDataOnError>false</responseDataOnError>
+          <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+          <bytes>true</bytes>
+          <url>true</url>
+        </value>
+      </objProp>
+      <stringProp name="filename">performance/jmeter/results/response_times.csv</stringProp>
+    </ResultCollector>
+    <hashTree/>
+
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

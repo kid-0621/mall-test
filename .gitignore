@@ -19,3 +19,8 @@ Thumbs.db
 # venv
 venv/
 env/
+
+# JMeter
+jmeter.log
+performance/jmeter/jmeter.log
+performance/jmeter/reports/

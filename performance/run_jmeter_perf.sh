@@ -41,15 +41,16 @@ echo "$STAGES" | while IFS=':' read -r name threads duration rampup desc; do
     echo "  并发: $threads | 时长: ${duration}s | 预热: ${rampup}s"
     echo "========================================"
     
-    # 清理旧结果
+    # 清理旧结果（注意：不预建目录，JMeter -e -o 需要目录不存在或为空）
     rm -rf "$RPT" "$JTL" 2>/dev/null
-    mkdir -p "$RPT"
     
-    # 生成参数化JMX
+    # 生成参数化JMX（匹配核心业务链路线程组的参数）
     cp "$JMX" "$TMP"
-    sed -i "185s/>[0-9]*</>$threads</" "$TMP"
-    sed -i "186s/>[0-9]*</>$rampup</" "$TMP"
-    sed -i "187s/>[0-9]*</>$duration</" "$TMP"
+    sed -i "/testname=\"核心业务链路/,/<\/ThreadGroup>/ {
+        s/<intProp name=\"ThreadGroup.num_threads\">[0-9]*</<intProp name=\"ThreadGroup.num_threads\">$threads</
+        s/<intProp name=\"ThreadGroup.ramp_time\">[0-9]*</<intProp name=\"ThreadGroup.ramp_time\">$rampup</
+        s/<longProp name=\"ThreadGroup.duration\">[0-9]*</<longProp name=\"ThreadGroup.duration\">$duration</
+    }" "$TMP"
     
     STAGE_START=$(date +%s)
     echo "启动 JMeter..."

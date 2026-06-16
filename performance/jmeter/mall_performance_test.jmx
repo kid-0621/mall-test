@@ -182,9 +182,9 @@ prev.setSuccessful(true);</stringProp>
       </JSR223Sampler>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="核心业务链路 - 混合场景" enabled="true">
-        <intProp name="ThreadGroup.num_threads">${__P(threads,50)}</intProp>
-        <intProp name="ThreadGroup.ramp_time">${__P(rampup,10)}</intProp>
-        <longProp name="ThreadGroup.duration">${__P(duration,300)}</longProp>
+        <intProp name="ThreadGroup.num_threads">50</intProp>
+        <intProp name="ThreadGroup.ramp_time">10</intProp>
+        <longProp name="ThreadGroup.duration">300</longProp>
         <longProp name="ThreadGroup.delay">0</longProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
